@@ -7,6 +7,7 @@
 package action
 
 import (
+	"github.com/iotexproject/iotex-core/pkg/log"
 	"math"
 	"math/big"
 
@@ -90,7 +91,11 @@ func Verify(sealed SealedEnvelope) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to generate envelope hash")
 	}
-	if sealed.SrcPubkey().Verify(h[:], sealed.Signature()) {
+	sig := sealed.Signature()
+	if sealed.SrcPubkey().Verify(h[:], sig) {
+		if sealed.encoding == 1 {
+			log.L().Info("verified web3 sig", log.Hex("rawHash", h[:]), log.Hex("sig", sig))
+		}
 		return nil
 	}
 	return errors.Wrapf(

@@ -4,8 +4,10 @@ import (
 	"github.com/iotexproject/go-pkgs/crypto"
 	"github.com/iotexproject/go-pkgs/hash"
 	"github.com/iotexproject/iotex-address/address"
+	"github.com/iotexproject/iotex-core/pkg/log"
 	"github.com/iotexproject/iotex-proto/golang/iotextypes"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/iotexproject/iotex-core/config"
@@ -112,10 +114,19 @@ func (sealed *SealedEnvelope) LoadProto(pbAct *iotextypes.Action) error {
 		if err != nil {
 			return err
 		}
-		if _, err = rlpSignedHash(tx, config.EVMNetworkID(), pbAct.GetSignature()); err != nil {
+		h, err := rlpSignedHash(tx, config.EVMNetworkID(), pbAct.GetSignature())
+		if err != nil {
 			return err
 		}
 		sealed.evmNetworkID = config.EVMNetworkID()
+		log.L().Info("LoadProto",
+			zap.Uint32("Version", pbAct.Core.Version),
+			zap.Uint64("Nonce", pbAct.Core.Nonce),
+			zap.Uint64("Limit", pbAct.Core.GasLimit),
+			zap.String("Price", pbAct.Core.GasPrice),
+			zap.Uint32("ChainID", pbAct.Core.ChainID),
+			log.Hex("Signature", pbAct.Signature),
+			log.Hex("signedHash", h[:]))
 	case iotextypes.Encoding_IOTEX_PROTOBUF:
 		break
 	default:
@@ -143,6 +154,11 @@ func actionToRLP(action Action) (rlpTransaction, error) {
 	case *Execution:
 		tx = (*Execution)(act)
 	case *CreateStake:
+		log.L().Info("CreateStake",
+			zap.String("name", act.candName),
+			zap.String("amount", act.amount.String()),
+			zap.Uint32("duration", act.duration),
+			zap.Bool("auto", act.autoStake))
 		tx, err = wrapStakingActionIntoExecution(act.AbstractAction, address.StakingCreateAddrHash[:], act.Proto())
 	case *DepositToStake:
 		tx, err = wrapStakingActionIntoExecution(act.AbstractAction, address.StakingAddDepositAddrHash[:], act.Proto())
