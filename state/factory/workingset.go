@@ -405,6 +405,10 @@ func (ws *workingSet) pickAndRunActions(
 				}
 			}
 			if err != nil {
+				log.L().Info("Error in Actpool",
+					zap.Error(err),
+					log.Hex("Signature", nextAction.Signature()),
+					zap.Uint32("Encoding", nextAction.Encoding()))
 				caller, err := address.FromBytes(nextAction.SrcPubkey().Hash())
 				if err != nil {
 					return nil, err
