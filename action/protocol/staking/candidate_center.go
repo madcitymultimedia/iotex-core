@@ -7,11 +7,15 @@
 package staking
 
 import (
+	"encoding/json"
+	"fmt"
 	"sync"
 
 	"github.com/iotexproject/iotex-address/address"
+	"go.uber.org/zap"
 
 	"github.com/iotexproject/iotex-core/action/protocol"
+	"github.com/iotexproject/iotex-core/pkg/log"
 )
 
 type (
@@ -219,6 +223,9 @@ func (m *CandidateCenter) ContainsSelfStakingBucket(index uint64) bool {
 
 // GetByName returns the candidate by name
 func (m *CandidateCenter) GetByName(name string) *Candidate {
+	candlog, _ := json.Marshal(m.base.nameMap)
+	log.L().Info("Candidate",
+		zap.String("Candidate Center", fmt.Sprintf("GetByName: %s\n", string(candlog))))
 	if d := m.change.getByName(name); d != nil {
 		return d
 	}
@@ -443,6 +450,8 @@ func (cb *candBase) commit(change *candChange) (int, error) {
 			return 0, err
 		}
 		d := v.Clone()
+		log.L().Info("Candidate",
+			zap.String("Candidate Center", fmt.Sprintf("Commit: %+v\n", d)))
 		cb.ownerMap[d.Owner.String()] = d
 		cb.nameMap[d.Name] = d
 		cb.operatorMap[d.Operator.String()] = d

@@ -10,8 +10,10 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 
 	"github.com/iotexproject/iotex-core/action"
+	"github.com/iotexproject/iotex-core/pkg/log"
 )
 
 // Errors
@@ -86,6 +88,8 @@ func (p *Protocol) validateCandidateUpdate(ctx context.Context, act *action.Cand
 
 // IsValidCandidateName check if a candidate name string is valid.
 func isValidCandidateName(s string) bool {
+	log.L().Info("Candidate",
+		zap.String("Candidate Name", s))
 	if len(s) == 0 || len(s) > 12 {
 		return false
 	}
