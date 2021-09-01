@@ -428,6 +428,11 @@ func (ws *workingSet) pickAndRunActions(
 				return nil, errors.Wrapf(err, "Failed to update state changes for selp %x", nextAction.Hash())
 			}
 			if receipt != nil {
+				// temp debug
+				log.L().Info("Receipt in Actpool",
+					log.Hex("Action Hash", receipt.ActionHash[:]),
+					log.Hex("Signature", nextAction.Signature()),
+					zap.Uint32("Encoding", nextAction.Encoding()))
 				blkCtx.GasLimit -= receipt.GasConsumed
 				ctx = protocol.WithBlockCtx(ctx, blkCtx)
 				receipts = append(receipts, receipt)
