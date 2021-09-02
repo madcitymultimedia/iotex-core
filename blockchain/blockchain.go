@@ -8,7 +8,6 @@ package blockchain
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"sync"
@@ -480,11 +479,12 @@ func (bc *blockchain) commitBlock(blk *block.Block) error {
 
 	for _, act := range blk.Actions {
 		if act.Encoding() == 1 {
-			actJson, err := json.Marshal(act)
-			if err == nil {
-				log.L().Error("Staking in the block",
-					zap.String("Action", fmt.Sprintf("%s\n", string(actJson))),
-					log.Hex("Signature", act.Signature()),
+			log.L().Info("Staking in the block",
+				zap.String("Action", fmt.Sprintf("%+v\n", act)),
+				zap.String("Envelop", fmt.Sprintf("%+v\n", act.Envelope)),
+				log.Hex("Signature", act.Signature()))
+			if err != nil {
+				log.L().Error("Err when staking in the block",
 					zap.Error(err))
 			}
 		}

@@ -8,7 +8,6 @@ package factory
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"sort"
 
@@ -500,14 +499,13 @@ func (ws *workingSet) CreateBuilder(
 	if err != nil {
 		return nil, err
 	}
+
 	for _, act := range actions {
 		if act.Encoding() == 1 {
-			actJson, err := json.Marshal(act)
-			if err == nil {
-				log.L().Error("Staking in BlockBuilder",
-					zap.String("Action", fmt.Sprintf("%s\n", string(actJson))),
-					log.Hex("Signature", act.Signature()))
-			}
+			log.L().Info("Staking in BlockBuilder",
+				zap.String("Action", fmt.Sprintf("%+v\n", act)),
+				zap.String("Envelop", fmt.Sprintf("%+v\n", act.Envelope)),
+				log.Hex("Signature", act.Signature()))
 		}
 	}
 
