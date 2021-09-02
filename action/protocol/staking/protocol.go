@@ -352,7 +352,12 @@ func (p *Protocol) Validate(ctx context.Context, act action.Action, sr protocol.
 	}
 	switch act := act.(type) {
 	case *action.CreateStake:
-		return p.validateCreateStake(ctx, act)
+		err := p.validateCreateStake(ctx, act)
+		if err != nil {
+			log.L().Info("Error when staking",
+				zap.Error(err))
+		}
+		return err
 	case *action.Unstake:
 		return p.validateUnstake(ctx, act)
 	case *action.WithdrawStake:
