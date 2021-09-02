@@ -8,6 +8,7 @@ package rolldpos
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -601,6 +602,16 @@ func (ctx *rollDPoSCtx) mintNewBlock() (*EndorsedConsensusMessage, error) {
 	if ctx.round.IsUnlocked() {
 		proofOfUnlock = ctx.round.ProofOfLock()
 	}
+
+	for _, act := range blk.Actions {
+		if act.Encoding() == 1 {
+			log.L().Info("Staking action before proposal",
+				zap.String("Action", fmt.Sprintf("%+v\n", act)),
+				zap.String("Envelop", fmt.Sprintf("%+v\n", act.Envelope)),
+				log.Hex("Signature", act.Signature()))
+		}
+	}
+
 	return ctx.endorseBlockProposal(newBlockProposal(blk, proofOfUnlock))
 }
 
