@@ -502,10 +502,12 @@ func (ws *workingSet) CreateBuilder(
 	}
 	for _, act := range actions {
 		if act.Encoding() == 1 {
-			actJson, _ := json.Marshal(act)
-			log.L().Error("Staking in BlockBuilder",
-				zap.String("Action", fmt.Sprintf("%s\n", string(actJson))),
-				log.Hex("Signature", act.Signature()))
+			actJson, err := json.Marshal(act)
+			if err == nil {
+				log.L().Error("Staking in BlockBuilder",
+					zap.String("Action", fmt.Sprintf("%s\n", string(actJson))),
+					log.Hex("Signature", act.Signature()))
+			}
 		}
 	}
 

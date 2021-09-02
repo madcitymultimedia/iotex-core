@@ -7,11 +7,12 @@
 package action
 
 import (
-	"github.com/iotexproject/iotex-core/pkg/log"
 	"math"
 	"math/big"
 
+	"github.com/iotexproject/iotex-core/pkg/log"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 
 	"github.com/iotexproject/go-pkgs/crypto"
 )
@@ -94,7 +95,10 @@ func Verify(sealed SealedEnvelope) error {
 	sig := sealed.Signature()
 	if sealed.SrcPubkey().Verify(h[:], sig) {
 		if sealed.encoding == 1 {
-			log.L().Info("verified web3 sig", log.Hex("rawHash", h[:]), log.Hex("sig", sig))
+			log.L().Info("verified web3 sig",
+				log.Hex("rawHash", h[:]),
+				log.Hex("sig", sig),
+				zap.String("Image tag", "r1.3"))
 		}
 		return nil
 	}

@@ -480,11 +480,13 @@ func (bc *blockchain) commitBlock(blk *block.Block) error {
 
 	for _, act := range blk.Actions {
 		if act.Encoding() == 1 {
-			actJson, _ := json.Marshal(act)
-			log.L().Error("Staking in the block",
-				zap.String("Action", fmt.Sprintf("%s\n", string(actJson))),
-				log.Hex("Signature", act.Signature()),
-				zap.Error(err))
+			actJson, err := json.Marshal(act)
+			if err == nil {
+				log.L().Error("Staking in the block",
+					zap.String("Action", fmt.Sprintf("%s\n", string(actJson))),
+					log.Hex("Signature", act.Signature()),
+					zap.Error(err))
+			}
 		}
 	}
 
