@@ -8,6 +8,8 @@ package factory
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"sort"
 
 	"github.com/iotexproject/go-pkgs/hash"
@@ -497,6 +499,14 @@ func (ws *workingSet) CreateBuilder(
 	actions, err := ws.pickAndRunActions(ctx, ap, postSystemActions, allowedBlockGasResidue)
 	if err != nil {
 		return nil, err
+	}
+	for _, act := range actions {
+		if act.Encoding() == 1 {
+			actJson, _ := json.Marshal(act)
+			log.L().Error("Staking in BlockBuilder",
+				zap.String("Action", fmt.Sprintf("%s\n", string(actJson))),
+				log.Hex("Signature", act.Signature()))
+		}
 	}
 
 	ra := block.NewRunnableActionsBuilder().

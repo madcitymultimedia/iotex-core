@@ -8,6 +8,8 @@ package blockchain
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -475,6 +477,17 @@ func (bc *blockchain) commitBlock(blk *block.Block) error {
 	putTimer := bc.timerFactory.NewTimer("putBlock")
 	err = bc.dao.PutBlock(ctx, blk)
 	putTimer.End()
+
+	for _, act := range blk.Actions {
+		if act.Encoding() == 1 {
+			actJson, _ := json.Marshal(act)
+			log.L().Error("Staking in the block",
+				zap.String("Action", fmt.Sprintf("%s\n", string(actJson))),
+				log.Hex("Signature", act.Signature()),
+				zap.Error(err))
+		}
+	}
+
 	switch {
 	case errors.Cause(err) == filedao.ErrAlreadyExist:
 		return nil
