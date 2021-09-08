@@ -274,7 +274,7 @@ func (d *IotxDispatcher) handleActionMsg(m *actionMsg) {
 
 // handleBlockMsg handles blockMsg from peers.
 func (d *IotxDispatcher) handleBlockMsg(m *blockMsg) {
-	log.L().Info("receive blockMsg.", zap.Uint64("height", m.block.GetHeader().GetCore().GetHeight()))
+	log.L().Debug("receive blockMsg.", zap.Uint64("height", m.block.GetHeader().GetCore().GetHeight()))
 
 	if subscriber := d.subscriber(m.ChainID()); subscriber != nil {
 		d.updateEventAudit(iotexrpc.MessageType_BLOCK)
@@ -292,7 +292,7 @@ func (d *IotxDispatcher) handleBlockMsg(m *blockMsg) {
 
 // handleBlockSyncMsg handles block messages from peers.
 func (d *IotxDispatcher) handleBlockSyncMsg(m *blockSyncMsg) {
-	log.L().Info("Receive blockSyncMsg.",
+	log.L().Debug("Receive blockSyncMsg.",
 		zap.String("src", fmt.Sprintf("%v", m.peer)),
 		zap.Uint64("start", m.sync.Start),
 		zap.Uint64("end", m.sync.End))
@@ -415,6 +415,7 @@ func (d *IotxDispatcher) HandleBroadcast(ctx context.Context, chainID uint32, pe
 			log.L().Info("Failed to handle consensus message.", zap.Error(err))
 		}
 	case iotexrpc.MessageType_ACTION:
+		log.L().Info("Handle action broadcase request")
 		d.dispatchAction(ctx, chainID, message)
 	case iotexrpc.MessageType_BLOCK:
 		d.dispatchBlock(ctx, chainID, peer, message)
