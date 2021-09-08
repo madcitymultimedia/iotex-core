@@ -403,14 +403,15 @@ func (ws *workingSet) pickAndRunActions(
 		for {
 			nextAction, ok := actionIterator.Next()
 
-			log.L().Info("Next act in actpool",
-				log.Hex("Signature", nextAction.Signature()),
-				zap.Uint32("Encoding", nextAction.Encoding()))
 			if !ok {
+				log.L().Info("fail to get Next act",
+					log.Hex("Signature", nextAction.Signature()),
+					zap.Uint32("Encoding", nextAction.Encoding()))
 				break
 			}
 			if nextAction.GasLimit() > blkCtx.GasLimit {
 				actionIterator.PopAccount()
+				log.L().Info("next act gaslimit is too large")
 				continue
 			}
 			if ctx, err = withActionCtx(ctx, nextAction); err == nil {
@@ -435,14 +436,25 @@ func (ws *workingSet) pickAndRunActions(
 				actionIterator.PopAccount()
 				continue
 			}
+			log.L().Info("act before running",
+				log.Hex("Signature", nextAction.Signature()),
+				zap.Uint32("Encoding", nextAction.Encoding()))
 			receipt, err := ws.runAction(ctx, nextAction)
 			switch errors.Cause(err) {
 			case nil:
 				// do nothing
 			case action.ErrHitGasLimit:
+				log.L().Info("Error in acquire receipt",
+					zap.Error(err),
+					log.Hex("Signature", nextAction.Signature()),
+					zap.Uint32("Encoding", nextAction.Encoding()))
 				actionIterator.PopAccount()
 				continue
 			default:
+				log.L().Info("Error in acquire receipt",
+					zap.Error(err),
+					log.Hex("Signature", nextAction.Signature()),
+					zap.Uint32("Encoding", nextAction.Encoding()))
 				return nil, errors.Wrapf(err, "Failed to update state changes for selp %x", nextAction.Hash())
 			}
 			if receipt != nil {

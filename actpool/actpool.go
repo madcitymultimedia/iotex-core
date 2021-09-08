@@ -398,7 +398,6 @@ func (ap *actPool) enqueueAction(sender string, act action.SealedEnvelope, actHa
 		)
 	}
 
-	log.L().Info("Add action into actqueue")
 	if err := queue.Put(act); err != nil {
 		actpoolMtc.WithLabelValues("failedPutActQueue").Inc()
 		return errors.Wrapf(err, "cannot put action %x into ActQueue", actHash)

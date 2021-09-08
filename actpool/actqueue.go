@@ -8,10 +8,11 @@ package actpool
 
 import (
 	"container/heap"
-	"go.uber.org/zap"
 	"math/big"
 	"sort"
 	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/facebookgo/clock"
 	"github.com/pkg/errors"
@@ -117,6 +118,9 @@ func (q *actQueue) Put(act action.SealedEnvelope) error {
 	}
 	heap.Push(&q.index, nonceWithTTL{nonce: nonce, deadline: q.clock.Now().Add(q.ttl)})
 	q.items[nonce] = act
+	// log.L().Info("Add action into actqueue",
+	// 	log.Hex("Signature", act.Signature()),
+	// 	zap.Uint32("Encoding", act.Encoding()))
 	return nil
 }
 
