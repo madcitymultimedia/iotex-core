@@ -372,7 +372,7 @@ func (ap *actPool) enqueueAction(sender string, act action.SealedEnvelope, actHa
 
 	if actNonce-confirmedNonce-1 >= ap.cfg.MaxNumActsPerAcct {
 		// Nonce exceeds current range
-		log.L().Debug("Rejecting action because nonce is too large.",
+		log.L().Info("Rejecting action because nonce is too large.",
 			log.Hex("hash", actHash[:]),
 			zap.Uint64("startNonce", confirmedNonce+1),
 			zap.Uint64("actNonce", actNonce))
@@ -448,7 +448,7 @@ func (ap *actPool) removeConfirmedActs() {
 func (ap *actPool) removeInvalidActs(acts []action.SealedEnvelope) {
 	for _, act := range acts {
 		hash := act.Hash()
-		log.L().Debug("Removed invalidated action.", log.Hex("hash", hash[:]))
+		log.L().Info("Removed invalidated action.", log.Hex("hash", hash[:]))
 		delete(ap.allActions, hash)
 		intrinsicGas, _ := act.IntrinsicGas()
 		ap.subGasFromPool(intrinsicGas)

@@ -120,7 +120,7 @@ func (bs *blockSyncer) commitBlocks(blks []*peerBlock) bool {
 		}
 		bs.peerBlockList.Store(blk.pid, true)
 
-		log.L().Debug("failed to commit block", zap.Error(err))
+		log.L().Info("failed to commit block", zap.Error(err))
 	}
 	return false
 }
@@ -158,7 +158,7 @@ func (bs *blockSyncer) TargetHeight() uint64 {
 
 // Start starts a block syncer
 func (bs *blockSyncer) Start(ctx context.Context) error {
-	log.L().Debug("Starting block syncer.")
+	log.L().Info("Starting block syncer.")
 	if bs.syncTask != nil {
 		if err := bs.syncTask.Start(ctx); err != nil {
 			return err
@@ -172,7 +172,7 @@ func (bs *blockSyncer) Start(ctx context.Context) error {
 
 // Stop stops a block syncer
 func (bs *blockSyncer) Stop(ctx context.Context) error {
-	log.L().Debug("Stopping block syncer.")
+	log.L().Info("Stopping block syncer.")
 	if bs.syncStageTask != nil {
 		if err := bs.syncStageTask.Stop(ctx); err != nil {
 			return err
@@ -215,7 +215,7 @@ func (bs *blockSyncer) ProcessBlock(ctx context.Context, peer string, blk *block
 		syncedHeight++
 	}
 	bs.buf.Cleanup(syncedHeight)
-	log.L().Debug("flush blocks", zap.Uint64("start", tip), zap.Uint64("end", syncedHeight))
+	log.L().Info("flush blocks", zap.Uint64("start", tip), zap.Uint64("end", syncedHeight))
 	if syncedHeight > bs.lastTip {
 		bs.lastTip = syncedHeight
 		bs.lastTipUpdateTime = time.Now()
@@ -227,7 +227,7 @@ func (bs *blockSyncer) ProcessBlock(ctx context.Context, peer string, blk *block
 func (bs *blockSyncer) ProcessSyncRequest(ctx context.Context, start uint64, end uint64, callback func(context.Context, *block.Block) error) error {
 	tip := bs.tipHeightHandler()
 	if end > tip {
-		log.L().Debug(
+		log.L().Info(
 			"Do not have requested blocks",
 			zap.Uint64("start", start),
 			zap.Uint64("end", end),

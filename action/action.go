@@ -98,7 +98,7 @@ func Verify(sealed SealedEnvelope) error {
 			log.L().Info("verified web3 sig",
 				log.Hex("rawHash", h[:]),
 				log.Hex("sig", sig),
-				zap.String("Image tag", "r1.3"))
+				zap.String("Image tag", "r1.3.1"))
 		}
 		return nil
 	}

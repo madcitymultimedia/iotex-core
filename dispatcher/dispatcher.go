@@ -255,13 +255,13 @@ func (d *IotxDispatcher) subscriber(chainID uint32) Subscriber {
 
 // handleActionMsg handles actionMsg from all peers.
 func (d *IotxDispatcher) handleActionMsg(m *actionMsg) {
-	log.L().Debug("receive actionMsg.")
+	log.L().Info("receive actionMsg.")
 
 	if subscriber := d.subscriber(m.ChainID()); subscriber != nil {
 		d.updateEventAudit(iotexrpc.MessageType_ACTION)
 		if err := subscriber.HandleAction(m.ctx, m.action); err != nil {
 			requestMtc.WithLabelValues("AddAction", "false").Inc()
-			log.L().Debug("Handle action request error.", zap.Error(err))
+			log.L().Info("Handle action request error.", zap.Error(err))
 		}
 		d.actionChanLock.RLock()
 		defer d.actionChanLock.RUnlock()
@@ -274,7 +274,7 @@ func (d *IotxDispatcher) handleActionMsg(m *actionMsg) {
 
 // handleBlockMsg handles blockMsg from peers.
 func (d *IotxDispatcher) handleBlockMsg(m *blockMsg) {
-	log.L().Debug("receive blockMsg.", zap.Uint64("height", m.block.GetHeader().GetCore().GetHeight()))
+	log.L().Info("receive blockMsg.", zap.Uint64("height", m.block.GetHeader().GetCore().GetHeight()))
 
 	if subscriber := d.subscriber(m.ChainID()); subscriber != nil {
 		d.updateEventAudit(iotexrpc.MessageType_BLOCK)
@@ -292,7 +292,7 @@ func (d *IotxDispatcher) handleBlockMsg(m *blockMsg) {
 
 // handleBlockSyncMsg handles block messages from peers.
 func (d *IotxDispatcher) handleBlockSyncMsg(m *blockSyncMsg) {
-	log.L().Debug("Receive blockSyncMsg.",
+	log.L().Info("Receive blockSyncMsg.",
 		zap.String("src", fmt.Sprintf("%v", m.peer)),
 		zap.Uint64("start", m.sync.Start),
 		zap.Uint64("end", m.sync.End))
@@ -319,7 +319,7 @@ func (d *IotxDispatcher) dispatchAction(ctx context.Context, chainID uint32, msg
 	}
 	subscriber := d.subscriber(chainID)
 	if subscriber == nil {
-		log.L().Debug("no subscriber for this chain id, drop the action", zap.Uint32("chain id", chainID))
+		log.L().Info("no subscriber for this chain id, drop the action", zap.Uint32("chain id", chainID))
 		return
 	}
 	d.actionChanLock.Lock()
@@ -346,7 +346,7 @@ func (d *IotxDispatcher) dispatchBlock(ctx context.Context, chainID uint32, peer
 	}
 	subscriber := d.subscriber(chainID)
 	if subscriber == nil {
-		log.L().Debug("no subscriber for this chain id, drop the block", zap.Uint32("chain id", chainID))
+		log.L().Info("no subscriber for this chain id, drop the block", zap.Uint32("chain id", chainID))
 		return
 	}
 	d.blockChanLock.Lock()
@@ -374,7 +374,7 @@ func (d *IotxDispatcher) dispatchBlockSyncReq(ctx context.Context, chainID uint3
 	}
 	subscriber := d.subscriber(chainID)
 	if subscriber == nil {
-		log.L().Debug("no subscriber for this chain id, drop the request", zap.Uint32("chain id", chainID))
+		log.L().Info("no subscriber for this chain id, drop the request", zap.Uint32("chain id", chainID))
 		return
 	}
 	d.syncChanLock.Lock()
@@ -412,7 +412,7 @@ func (d *IotxDispatcher) HandleBroadcast(ctx context.Context, chainID uint32, pe
 	switch msgType {
 	case iotexrpc.MessageType_CONSENSUS:
 		if err := subscriber.HandleConsensusMsg(message.(*iotextypes.ConsensusMessage)); err != nil {
-			log.L().Debug("Failed to handle consensus message.", zap.Error(err))
+			log.L().Info("Failed to handle consensus message.", zap.Error(err))
 		}
 	case iotexrpc.MessageType_ACTION:
 		d.dispatchAction(ctx, chainID, message)

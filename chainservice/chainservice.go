@@ -343,7 +343,7 @@ func New(
 		},
 		func(blk *block.Block) error {
 			if err := consensus.ValidateBlockFooter(blk); err != nil {
-				log.L().Debug("Failed to validate block footer.", zap.Error(err), zap.Uint64("height", blk.Height()))
+				log.L().Info("Failed to validate block footer.", zap.Error(err), zap.Uint64("height", blk.Height()))
 				return err
 			}
 			retries := 1
@@ -359,17 +359,17 @@ func New(
 				}
 				switch errors.Cause(err) {
 				case blockchain.ErrInvalidTipHeight:
-					log.L().Debug("Skip block.", zap.Error(err), zap.Uint64("height", blk.Height()))
+					log.L().Info("Skip block.", zap.Error(err), zap.Uint64("height", blk.Height()))
 					return nil
 				case block.ErrDeltaStateMismatch:
-					log.L().Debug("Delta state mismatched.", zap.Uint64("height", blk.Height()))
+					log.L().Info("Delta state mismatched.", zap.Uint64("height", blk.Height()))
 				default:
-					log.L().Debug("Failed to commit the block.", zap.Error(err), zap.Uint64("height", blk.Height()))
+					log.L().Info("Failed to commit the block.", zap.Error(err), zap.Uint64("height", blk.Height()))
 					return err
 				}
 			}
 			if err != nil {
-				log.L().Debug("Failed to commit block.", zap.Error(err), zap.Uint64("height", blk.Height()))
+				log.L().Info("Failed to commit block.", zap.Error(err), zap.Uint64("height", blk.Height()))
 				return err
 			}
 			log.L().Info("Successfully committed block.", zap.Uint64("height", blk.Height()))
@@ -569,7 +569,7 @@ func (cs *ChainService) HandleAction(ctx context.Context, actPb *iotextypes.Acti
 	ctx = protocol.WithRegistry(ctx, cs.registry)
 	err := cs.actpool.Add(ctx, act)
 	if err != nil {
-		log.L().Debug(err.Error())
+		log.L().Info(err.Error())
 	}
 	return err
 }
