@@ -380,6 +380,7 @@ func (ws *workingSet) pickAndRunActions(
 	if err != nil {
 		return nil, err
 	}
+	log.L().Info("pick action from actpool")
 	receipts := make([]*action.Receipt, 0)
 	executedActions := make([]action.SealedEnvelope, 0)
 	reg := protocol.MustGetRegistry(ctx)

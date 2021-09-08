@@ -415,7 +415,7 @@ func (d *IotxDispatcher) HandleBroadcast(ctx context.Context, chainID uint32, pe
 			log.L().Info("Failed to handle consensus message.", zap.Error(err))
 		}
 	case iotexrpc.MessageType_ACTION:
-		log.L().Info("Handle action broadcase request")
+		log.L().Info("Handle action broadcast request")
 		d.dispatchAction(ctx, chainID, message)
 	case iotexrpc.MessageType_BLOCK:
 		d.dispatchBlock(ctx, chainID, peer, message)

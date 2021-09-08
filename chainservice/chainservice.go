@@ -567,6 +567,7 @@ func (cs *ChainService) HandleAction(ctx context.Context, actPb *iotextypes.Acti
 		return err
 	}
 	ctx = protocol.WithRegistry(ctx, cs.registry)
+	log.L().Info("Add action into actpool")
 	err := cs.actpool.Add(ctx, act)
 	if err != nil {
 		log.L().Info(err.Error())
