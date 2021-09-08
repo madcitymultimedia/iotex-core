@@ -378,9 +378,10 @@ func (ws *workingSet) pickAndRunActions(
 ) ([]action.SealedEnvelope, error) {
 	err := ws.validate(ctx)
 	if err != nil {
+		log.L().Info("fail to validate ctx",
+			zap.Error(err))
 		return nil, err
 	}
-	log.L().Info("pick action from actpool")
 	receipts := make([]*action.Receipt, 0)
 	executedActions := make([]action.SealedEnvelope, 0)
 	reg := protocol.MustGetRegistry(ctx)
@@ -388,6 +389,8 @@ func (ws *workingSet) pickAndRunActions(
 	for _, p := range reg.All() {
 		if pp, ok := p.(protocol.PreStatesCreator); ok {
 			if err := pp.CreatePreStates(ctx, ws); err != nil {
+				log.L().Info("Error create States",
+					zap.Error(err))
 				return nil, err
 			}
 		}
@@ -399,6 +402,10 @@ func (ws *workingSet) pickAndRunActions(
 		actionIterator := actioniterator.NewActionIterator(ap.PendingActionMap())
 		for {
 			nextAction, ok := actionIterator.Next()
+
+			log.L().Info("Next act in actpool",
+				log.Hex("Signature", nextAction.Signature()),
+				zap.Uint32("Encoding", nextAction.Encoding()))
 			if !ok {
 				break
 			}
