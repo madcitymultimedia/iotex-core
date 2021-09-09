@@ -364,9 +364,23 @@ func (ws *workingSet) process(ctx context.Context, actions []action.SealedEnvelo
 
 	receipts, err := ws.runActions(ctx, actions)
 	if err != nil {
+		log.L().Info("Failed to run actions",
+			zap.Error(err))
 		return err
 	}
 	ws.receipts = receipts
+	for _, act := range actions {
+		if act.Encoding() == 1 {
+			log.L().Info("Staking action after the validation",
+				zap.String("Action", fmt.Sprintf("%+v\n", act)),
+				zap.String("Envelop", fmt.Sprintf("%+v\n", act.Envelope)),
+				log.Hex("Signature", act.Signature()))
+			for _, v := range receipts {
+				log.L().Info("Print receipts after the validation",
+					log.Hex("ActHash", v.ActionHash[:]))
+			}
+		}
+	}
 	return ws.finalize()
 }
 
@@ -498,15 +512,6 @@ func (ws *workingSet) ValidateBlock(ctx context.Context, blk *block.Block) error
 		return errors.Wrap(err, "failed to validate nonce")
 	}
 
-	for _, act := range blk.Actions {
-		if act.Encoding() == 1 {
-			log.L().Info("Staking action before validation block",
-				zap.String("Action", fmt.Sprintf("%+v\n", act)),
-				zap.String("Envelop", fmt.Sprintf("%+v\n", act.Envelope)),
-				log.Hex("Signature", act.Signature()))
-		}
-	}
-
 	if err := ws.process(ctx, blk.RunnableActions().Actions()); err != nil {
 		log.L().Error("Failed to update state.", zap.Uint64("height", ws.height), zap.Error(err))
 		return err
@@ -524,6 +529,15 @@ func (ws *workingSet) ValidateBlock(ctx context.Context, blk *block.Block) error
 	if err = blk.VerifyReceiptRoot(calculateReceiptRoot(ws.receipts)); err != nil {
 		log.L().Error("Failed to verify receipt root.", zap.Uint64("height", ws.height), zap.Error(err))
 		return errors.Wrap(err, "Failed to verify receipt root")
+	}
+
+	for _, act := range blk.Actions {
+		if act.Encoding() == 1 {
+			log.L().Info("Staking action after ValidateBlock",
+				zap.String("Action", fmt.Sprintf("%+v\n", act)),
+				zap.String("Envelop", fmt.Sprintf("%+v\n", act.Envelope)),
+				log.Hex("Signature", act.Signature()))
+		}
 	}
 
 	return nil
