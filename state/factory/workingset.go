@@ -404,9 +404,6 @@ func (ws *workingSet) pickAndRunActions(
 			nextAction, ok := actionIterator.Next()
 
 			if !ok {
-				log.L().Info("fail to get Next act",
-					log.Hex("Signature", nextAction.Signature()),
-					zap.Uint32("Encoding", nextAction.Encoding()))
 				break
 			}
 			if nextAction.GasLimit() > blkCtx.GasLimit {
