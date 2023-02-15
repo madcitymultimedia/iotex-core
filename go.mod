@@ -26,7 +26,7 @@ require (
 	github.com/minio/blake2b-simd v0.0.0-20160723061019-3f5f724cb5b1
 	github.com/multiformats/go-multiaddr v0.3.3
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.10.0
+	github.com/prometheus/client_golang v1.11.1
 	github.com/rodaine/table v1.0.1
 	github.com/rs/zerolog v1.18.0
 	github.com/schollz/progressbar/v2 v2.15.0
@@ -43,7 +43,7 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	google.golang.org/genproto v0.0.0-20201211151036-40ec1c210f7a
 	google.golang.org/grpc v1.33.2
-	google.golang.org/protobuf v1.25.0
+	google.golang.org/protobuf v1.26.0-rc.1
 	gopkg.in/yaml.v2 v2.4.0
 )
 
